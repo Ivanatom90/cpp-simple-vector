@@ -317,19 +317,19 @@ public:
        Iterator Insert(ConstIterator pos, Type&& value) {
               if (begin() <= pos && end() >= pos) {
                   if (!capacity_) {
-                      ArrayPtr<Type> helper(++capacity_);
-                      std::move(begin(), end(), &helper[0]);
-                      s_vector_.swap(helper);
+                      ArrayPtr<Type> tmp(++capacity_);
+                      std::move(begin(), end(), &tmp[0]);
+                      s_vector_.swap(tmp);
                       s_vector_[size_++] = std::move(value);
                       return begin();
                   } else if (capacity_ < size_ || capacity_ == size_) {
                       auto index = std::distance(begin(), const_cast<Iterator>(pos));
-                      ArrayPtr<Type> helper(capacity_*=2);
-                      std::move(begin(), end(), &helper[0]);
-                      std::copy_backward(std::make_move_iterator(const_cast<Iterator>(pos)), std::make_move_iterator(begin()+size_), (&helper[1 + size_]));
-                      helper[index] = std::move(value);
+                      ArrayPtr<Type> tmp(capacity_*=2);
+                      std::move(begin(), end(), &tmp[0]);
+                      std::copy_backward(std::make_move_iterator(const_cast<Iterator>(pos)), std::make_move_iterator(begin()+size_), (&tmp[1 + size_]));
+                      tmp[index] = std::move(value);
                       ++size_;
-                      s_vector_.swap(helper);
+                      s_vector_.swap(tmp);
                       return Iterator(&s_vector_[index]);
                   } else {
                       std::copy_backward(std::make_move_iterator(const_cast<Iterator>(pos)), std::make_move_iterator(end()), (&s_vector_[++size_+1]));
